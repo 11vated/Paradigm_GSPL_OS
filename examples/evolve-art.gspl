@@ -1,0 +1,13 @@
+seed AbstractArt : visual2d {
+  genes {
+    width: 800
+    height: 600
+    complexity: 7
+    symmetry: "radial"
+    style: "abstract"
+    density: 0.5
+    curvature: 0.5
+  }
+}
+
+let evolved = evolve(AbstractArt, 20)

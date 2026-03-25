@@ -1,0 +1,14 @@
+seed DungeonLevel : procedural {
+  genes {
+    type: "dungeon"
+    width: 64
+    height: 64
+    octaves: 4
+    persistence: 0.5
+    lacunarity: 2.0
+    threshold: 0.45
+    roomCount: 8
+    corridorWidth: 2
+    erosionPasses: 3
+  }
+}

@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSPL Paradigm Engine - Interactive Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00ff88;
+            --secondary: #7b61ff;
+            --accent: #ff006e;
+            --dark: #0a0e27;
+            --darker: #050810;
+            --surface: #1a1f3a;
+            --surface-light: #232d4d;
+            --text: #e0e0e0;
+            --text-muted: #a0a0a0;
+        }
+
+        html, body {
+            background-color: var(--darker);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ========== HERO SECTION ========== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            padding: 40px 20px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(123, 97, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 700;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.3));
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .hero-tagline {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 60px;
+            line-height: 1.8;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--darker);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .hero-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.5);
+        }
+
+        /* ========== SEED EDITOR SECTION ========== */
+        .section {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 20px;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-subtitle {
+            color: var(--text-muted);
+            margin-bottom: 40px;
+        }
+
+        .editor-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        @media (max-width: 1024px) {
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .editor-panel {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .editor-label {
+            display: block;
+            margin-bottom: 12px;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .editor-textarea {
+            width: 100%;
+            height: 400px;
+            background: var(--darker);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 8px;
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            padding: 20px;
+            resize: vertical;
+            line-height: 1.5;
+        }
+
+        .editor-textarea::placeholder {
+            color: var(--text-muted);
+        }
+
+        .editor-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--darker);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 0 20px rgba(123, 97, 255, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-accent {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-accent:hover {
+            box-shadow: 0 0 20px rgba(255, 0, 110, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .preview-panel {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-canvas {
+            flex: 1;
+            background: var(--darker);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .preview-info {
+            background: var(--darker);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(123, 97, 255, 0.2);
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: var(--text-muted);
+        }
+
+        .info-value {
+            color: var(--primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ========== DOMAIN SHOWCASE ========== */
+        .domains-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 80px;
+        }
+
+        .domain-card {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .domain-card:hover {
+            border-color: rgba(0, 255, 136, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.1);
+        }
+
+        .domain-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .domain-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .domain-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .domain-preview {
+            background: var(--darker);
+            border: 1px solid rgba(123, 97, 255, 0.2);
+            border-radius: 8px;
+            height: 150px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .domain-btn {
+            width: 100%;
+            padding: 10px;
+            background: var(--secondary);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .domain-btn:hover {
+            box-shadow: 0 0 20px rgba(123, 97, 255, 0.4);
+        }
+
+        /* ========== ARCHITECTURE DIAGRAM ========== */
+        .architecture {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 80px;
+        }
+
+        .arch-layer {
+            background: var(--darker);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .arch-layer:hover {
+            border-color: var(--secondary);
+            box-shadow: 0 0 20px rgba(123, 97, 255, 0.3);
+            transform: translateX(10px);
+        }
+
+        .arch-layer-title {
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+
+        .arch-layer-desc {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        /* ========== STATS SECTION ========== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 80px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            border-color: rgba(0, 255, 136, 0.5);
+            transform: translateY(-4px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ========== EVOLUTION VISUALIZER ========== */
+        .evolution-container {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            padding: 40px;
+            backdrop-filter: blur(10px);
+            margin-bottom: 80px;
+        }
+
+        #evolutionCanvas {
+            width: 100%;
+            height: 400px;
+            background: var(--darker);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 8px;
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .evolution-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .evolution-stat {
+            background: var(--darker);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(123, 97, 255, 0.2);
+        }
+
+        .evolution-stat-label {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .evolution-stat-value {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ========== CODE EXAMPLES ========== */
+        .code-examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 80px;
+        }
+
+        .code-example {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .code-example-title {
+            background: var(--darker);
+            padding: 15px 20px;
+            color: var(--primary);
+            font-weight: 600;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        .code-example-content {
+            padding: 20px;
+            background: var(--darker);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        .code-keyword {
+            color: var(--secondary);
+        }
+
+        .code-string {
+            color: var(--accent);
+        }
+
+        .code-type {
+            color: var(--primary);
+        }
+
+        /* ========== FOOTER ========== */
+        .footer {
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+            border-top: 1px solid rgba(0, 255, 136, 0.2);
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
+        }
+
+        .footer-title {
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-tagline {
+                font-size: 1rem;
+            }
+
+            .editor-container {
+                grid-template-columns: 1fr;
+            }
+
+            .editor-textarea {
+                height: 300px;
+            }
+
+            .domains-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .editor-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">GSPL Paradigm Engine</h1>
+            <div class="hero-subtitle">Generative Seed Technology</div>
+            <p class="hero-tagline">
+                Fitting 1TB into 1KB. Generating fully polished programs from kilobytes of seed data.<br>
+                <span style="color: var(--primary); font-size: 0.9rem;">by 11vatedTech</span>
+            </p>
+            <button class="hero-cta" onclick="document.querySelector('.editor-container').scrollIntoView({behavior: 'smooth'})">
+                Explore the Engine
+            </button>
+        </div>
+    </section>
+
+    <!-- SEED EDITOR SECTION -->
+    <section class="section">
+        <h2 class="section-title">Live Seed Editor</h2>
+        <p class="section-subtitle">Generate SVG art from seed genes in real-time</p>
+
+        <div class="editor-container">
+            <div class="editor-panel">
+                <label class="editor-label">Seed Definition</label>
+                <textarea class="editor-textarea" id="seedEditor" placeholder="seed MyArt : visual2d {
+  genes {
+    width: 400
+    height: 400
+    shapeCount: 8
+    symmetry: 'radial'
+    paletteHue: 0.5
+    paletteSaturation: 0.8
+    complexity: 0.6
+  }
+}"></textarea>
+                <div class="editor-buttons">
+                    <button class="btn btn-primary" onclick="generateSeed()">Generate</button>
+                    <button class="btn btn-secondary" onclick="mutateSeed()">Mutate</button>
+                    <button class="btn btn-accent" onclick="breedSeeds()">Breed</button>
+                </div>
+            </div>
+
+            <div class="preview-panel">
+                <label class="editor-label">Preview Output</label>
+                <div class="preview-canvas" id="previewCanvas">
+                    <svg id="generatedSVG" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" style="width: 300px; height: 300px;">
+                        <rect width="400" height="400" fill="#0a0e27"/>
+                    </svg>
+                </div>
+                <div class="preview-info">
+                    <div class="info-row">
+                        <span class="info-label">Seed Hash</span>
+                        <span class="info-value" id="seedHash">generating...</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Generation</span>
+                        <span class="info-value" id="generation">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Shape Count</span>
+                        <span class="info-value" id="shapeCount">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Symmetry</span>
+                        <span class="info-value" id="symmetryType">none</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DOMAIN SHOWCASE -->
+    <section class="section">
+        <h2 class="section-title">7 Domain Engines</h2>
+        <p class="section-subtitle">Each specialized for a different generative task</p>
+
+        <div class="domains-grid">
+            <!-- Visual 2D -->
+            <div class="domain-card">
+                <div class="domain-icon">🎨</div>
+                <div class="domain-name">Visual 2D</div>
+                <div class="domain-desc">Generate vector graphics, logos, and 2D art with symmetry and color harmony</div>
+                <div class="domain-preview" id="viz2d-preview">
+                    <svg viewBox="0 0 200 200" style="width: 150px; height: 150px;">
+                        <circle cx="100" cy="100" r="50" fill="#00ff88" opacity="0.6"/>
+                        <rect x="60" y="60" width="80" height="80" fill="none" stroke="#7b61ff" stroke-width="2" transform="rotate(45 100 100)"/>
+                    </svg>
+                </div>
+                <button class="domain-btn" onclick="generateDomain('visual2d')">Generate</button>
+            </div>
+
+            <!-- 3D Geometry -->
+            <div class="domain-card">
+                <div class="domain-icon">🧊</div>
+                <div class="domain-name">3D Geometry</div>
+                <div class="domain-desc">Create mesh data, wireframes, and 3D structures</div>
+                <div class="domain-preview" id="geometry-preview">
+                    <canvas id="canvas3d" width="200" height="200" style="width: 150px; height: 150px;"></canvas>
+                </div>
+                <button class="domain-btn" onclick="generateDomain('geometry3d')">Generate</button>
+            </div>
+
+            <!-- Animation -->
+            <div class="domain-card">
+                <div class="domain-icon">🎬</div>
+                <div class="domain-name">Animation</div>
+                <div class="domain-desc">Generate keyframe animations and sprite sheets</div>
+                <div class="domain-preview" id="anim-preview">
+                    <div style="position: relative; width: 150px; height: 150px;">
+                        <div style="position: absolute; left: 75px; top: 75px; width: 20px; height: 20px; background: #00ff88; border-radius: 50%; animation: bounce 1s infinite;"></div>
+                    </div>
+                </div>
+                <button class="domain-btn" onclick="generateDomain('animation')">Generate</button>
+            </div>
+
+            <!-- Audio -->
+            <div class="domain-card">
+                <div class="domain-icon">🎵</div>
+                <div class="domain-name">Audio/Music</div>
+                <div class="domain-desc">Generate melodies, chord progressions, and sound design</div>
+                <div class="domain-preview" id="audio-preview">
+                    <svg viewBox="0 0 200 200" style="width: 150px; height: 150px;">
+                        <rect x="30" y="50" width="15" height="100" fill="#7b61ff"/>
+                        <rect x="60" y="40" width="15" height="110" fill="#00ff88"/>
+                        <rect x="90" y="60" width="15" height="90" fill="#ff006e"/>
+                        <rect x="120" y="45" width="15" height="105" fill="#7b61ff"/>
+                        <rect x="150" y="70" width="15" height="80" fill="#00ff88"/>
+                    </svg>
+                </div>
+                <button class="domain-btn" onclick="generateDomain('audio')">Generate</button>
+            </div>
+
+            <!-- Game -->
+            <div class="domain-card">
+                <div class="domain-icon">🎮</div>
+                <div class="domain-name">Game</div>
+                <div class="domain-desc">Generate complete game levels and world data</div>
+                <div class="domain-preview" id="game-preview">
+                    <svg viewBox="0 0 200 200" style="width: 150px; height: 150px;">
+                        <rect x="10" y="120" width="180" height="70" fill="#4a5568"/>
+                        <rect x="30" y="80" width="50" height="50" fill="#8b8b8b"/>
+                        <rect x="120" y="90" width="50" height="40" fill="#8b8b8b"/>
+                        <circle cx="100" cy="40" r="15" fill="#00ff88"/>
+                    </svg>
+                </div>
+                <button class="domain-btn" onclick="generateDomain('game')">Generate</button>
+            </div>
+
+            <!-- UI -->
+            <div class="domain-card">
+                <div class="domain-icon">🖼️</div>
+                <div class="domain-name">UI Components</div>
+                <div class="domain-desc">Generate responsive UI layouts and component trees</div>
+                <div class="domain-preview" id="ui-preview">
+                    <svg viewBox="0 0 200 200" style="width: 150px; height: 150px;">
+                        <rect x="10" y="10" width="180" height="30" fill="#7b61ff"/>
+                        <rect x="10" y="50" width="180" height="60" fill="#1a1f3a"/>
+                        <rect x="10" y="50" width="30" height="60" fill="#00ff88"/>
+                        <rect x="50" y="50" width="140" height="30" fill="#232d4d"/>
+                    </svg>
+                </div>
+                <button class="domain-btn" onclick="generateDomain('ui')">Generate</button>
+            </div>
+
+            <!-- Procedural -->
+            <div class="domain-card">
+                <div class="domain-icon">🌍</div>
+                <div class="domain-name">Procedural</div>
+                <div class="domain-desc">Generate terrain, heightmaps, and procedural content</div>
+                <div class="domain-preview" id="procedural-preview">
+                    <svg viewBox="0 0 200 200" style="width: 150px; height: 150px;">
+                        <rect x="10" y="10" width="20" height="20" fill="#2d5016"/>
+                        <rect x="40" y="20" width="20" height="20" fill="#3d6b1f"/>
+                        <rect x="70" y="15" width="20" height="20" fill="#4a8c2a"/>
+                        <rect x="100" y="25" width="20" height="20" fill="#3d6b1f"/>
+                        <rect x="130" y="10" width="20" height="20" fill="#2d5016"/>
+                        <rect x="160" y="20" width="20" height="20" fill="#3d6b1f"/>
+                    </svg>
+                </div>
+                <button class="domain-btn" onclick="generateDomain('procedural')">Generate</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ARCHITECTURE DIAGRAM -->
+    <section class="section">
+        <h2 class="section-title">3-Layer Architecture</h2>
+        <p class="section-subtitle">Hierarchical generative system design</p>
+
+        <div class="architecture">
+            <div class="arch-layer">
+                <div class="arch-layer-title">Intelligence Layer</div>
+                <div class="arch-layer-desc">Memory • Reasoning • 8 Specialized Sub-Agents</div>
+            </div>
+            <div style="text-align: center; color: var(--primary); font-weight: 700;">↓</div>
+            <div class="arch-layer">
+                <div class="arch-layer-title">Domain Engines</div>
+                <div class="arch-layer-desc">7 Specialized Generative Engines: Visual • 3D • Audio • Game • UI • Animation • Procedural</div>
+            </div>
+            <div style="text-align: center; color: var(--primary); font-weight: 700;">↓</div>
+            <div class="arch-layer">
+                <div class="arch-layer-title">Seed Kernel</div>
+                <div class="arch-layer-desc">Genes • Deterministic RNG • Genetic Operators • Algebraic Framework</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS SECTION -->
+    <section class="section">
+        <h2 class="section-title">By The Numbers</h2>
+        <p class="section-subtitle">The scale of the GSPL Paradigm Engine</p>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="stat-files">0</div>
+                <div class="stat-label">Source Files</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-lines">0</div>
+                <div class="stat-label">Lines of Code</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-tests">0</div>
+                <div class="stat-label">Tests Passing</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-domains">7</div>
+                <div class="stat-label">Domain Engines</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-agents">8</div>
+                <div class="stat-label">AI Sub-Agents</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="stat-seeds">24</div>
+                <div class="stat-label">Seed Domains</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EVOLUTION VISUALIZER -->
+    <section class="section">
+        <h2 class="section-title">Evolution Simulator</h2>
+        <p class="section-subtitle">Watch a population of seeds evolve through mutation and selection</p>
+
+        <div class="evolution-container">
+            <canvas id="evolutionCanvas"></canvas>
+            <div class="evolution-stats">
+                <div class="evolution-stat">
+                    <div class="evolution-stat-label">Generation</div>
+                    <div class="evolution-stat-value" id="evoGen">0</div>
+                </div>
+                <div class="evolution-stat">
+                    <div class="evolution-stat-label">Population</div>
+                    <div class="evolution-stat-value" id="evoPop">20</div>
+                </div>
+                <div class="evolution-stat">
+                    <div class="evolution-stat-label">Avg Fitness</div>
+                    <div class="evolution-stat-value" id="evoFit">0.00</div>
+                </div>
+                <div class="evolution-stat">
+                    <div class="evolution-stat-label">Max Fitness</div>
+                    <div class="evolution-stat-value" id="evoMax">0.00</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CODE EXAMPLES -->
+    <section class="section">
+        <h2 class="section-title">GSPL Code Examples</h2>
+        <p class="section-subtitle">Seed definitions and genetic operations</p>
+
+        <div class="code-examples">
+            <div class="code-example">
+                <div class="code-example-title">Basic Seed Declaration</div>
+                <div class="code-example-content"><span class="code-keyword">seed</span> MyArt <span class="code-keyword">:</span> visual2d {<br>  <span class="code-keyword">genes</span> {<br>    width<span class="code-keyword">:</span> <span class="code-string">800</span><br>    height<span class="code-keyword">:</span> <span class="code-string">600</span><br>    complexity<span class="code-keyword">:</span> <span class="code-string">0.7</span><br>    symmetry<span class="code-keyword">:</span> <span class="code-string">"radial"</span><br>  }<br>}</div>
+            </div>
+
+            <div class="code-example">
+                <div class="code-example-title">Crossover Operation</div>
+                <div class="code-example-content"><span class="code-keyword">let</span> child <span class="code-keyword">=</span> <span class="code-type">crossover</span>(<br>  parent1<span class="code-keyword">,</span><br>  parent2<span class="code-keyword">,</span><br>  <span class="code-string">0.5</span><br>)<br><br><span class="code-keyword">let</span> mutated <span class="code-keyword">=</span> <span class="code-type">mutate</span>(<br>  child<span class="code-keyword">,</span><br>  rate<span class="code-keyword">:</span> <span class="code-string">0.05</span><br>)</div>
+            </div>
+
+            <div class="code-example">
+                <div class="code-example-title">Multi-Domain Evolution</div>
+                <div class="code-example-content"><span class="code-keyword">let</span> population <span class="code-keyword">=</span> [<br>  visual2d<span class="code-keyword">,</span><br>  audio<span class="code-keyword">,</span><br>  game<br>]<br><br><span class="code-keyword">for</span> gen <span class="code-keyword">in</span> <span class="code-string">100</span> {<br>  evaluate(population)<br>  select(population)<br>  breed(population)<br>}</div>
+            </div>
+
+            <div class="code-example">
+                <div class="code-example-title">Seed Hash Verification</div>
+                <div class="code-example-content"><span class="code-keyword">let</span> seed <span class="code-keyword">=</span> <span class="code-type">create</span>(<br>  <span class="code-string">"MyComposition"</span><br>)<br><br><span class="code-keyword">let</span> hash <span class="code-keyword">=</span> <span class="code-type">hash</span>(seed)<br><span class="code-type">validate</span>(seed) <br>  ✓ <span class="code-string">Success</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-title">GSPL Paradigm Engine v1.0.0</div>
+        <div>Created by Kahlil Stephens / 11vatedTech</div>
+        <div style="margin-top: 20px; font-size: 0.9rem;">
+            Generative Seed Technology — The Future of Programming
+        </div>
+    </footer>
+
+    <style>
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+
+    <script>
+        // ========== SIMPLE RNG =========
+        class SimpleRNG {
+            constructor(seed) {
+                this.seed = seed;
+            }
+
+            next() {
+                this.seed = (this.seed * 9301 + 49297) % 233280;
+                return this.seed / 233280;
+            }
+
+            nextInt(min, max) {
+                return Math.floor(this.next() * (max - min + 1)) + min;
+            }
+
+            nextBool(prob = 0.5) {
+                return this.next() < prob;
+            }
+
+            pick(arr) {
+                return arr[Math.floor(this.next() * arr.length)];
+            }
+        }
+
+        // ========== SIMPLE HASH =========
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString(16).substring(0, 16);
+        }
+
+        // ========== SVG GENERATOR =========
+        class SimpleSVGGenerator {
+            constructor(seed, rng) {
+                this.seed = seed;
+                this.rng = rng;
+            }
+
+            generate() {
+                const width = this.seed.width || 400;
+                const height = this.seed.height || 400;
+                const shapeCount = this.seed.shapeCount || 5;
+                const symmetry = this.seed.symmetry || 'none';
+                const hue = this.seed.hue || 0.5;
+                const saturation = this.seed.saturation || 0.8;
+
+                let svg = `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">`;
+                svg += `<rect width="${width}" height="${height}" fill="#0a0e27"/>`;
+
+                const shapes = [];
+                for (let i = 0; i < shapeCount; i++) {
+                    const x = this.rng.nextInt(50, width - 50);
+                    const y = this.rng.nextInt(50, height - 50);
+                    const size = this.rng.nextInt(20, 80);
+                    const h = (hue + i * (1 / shapeCount)) % 1;
+                    const color = this.hslToHex(h, saturation, 0.5);
+                    const opacity = 0.3 + this.rng.next() * 0.7;
+
+                    shapes.push({ x, y, size, color, opacity });
+                }
+
+                // Apply symmetry
+                const symmetryOrder = this.seed.symmetryOrder || 4;
+                if (symmetry === 'radial') {
+                    for (const shape of shapes) {
+                        for (let i = 0; i < symmetryOrder; i++) {
+                            const angle = (i / symmetryOrder) * Math.PI * 2;
+                            const cx = width / 2;
+                            const cy = height / 2;
+                            const rotX = cx + (shape.x - cx) * Math.cos(angle) - (shape.y - cy) * Math.sin(angle);
+                            const rotY = cy + (shape.x - cx) * Math.sin(angle) + (shape.y - cy) * Math.cos(angle);
+                            svg += `<circle cx="${rotX}" cy="${rotY}" r="${shape.size / 2}" fill="${shape.color}" opacity="${shape.opacity}"/>`;
+                        }
+                    }
+                } else if (symmetry === 'bilateral') {
+                    for (const shape of shapes) {
+                        svg += `<circle cx="${shape.x}" cy="${shape.y}" r="${shape.size / 2}" fill="${shape.color}" opacity="${shape.opacity}"/>`;
+                        svg += `<circle cx="${width - shape.x}" cy="${shape.y}" r="${shape.size / 2}" fill="${shape.color}" opacity="${shape.opacity}"/>`;
+                    }
+                } else {
+                    for (const shape of shapes) {
+                        svg += `<circle cx="${shape.x}" cy="${shape.y}" r="${shape.size / 2}" fill="${shape.color}" opacity="${shape.opacity}"/>`;
+                    }
+                }
+
+                svg += `</svg>`;
+                return svg;
+            }
+
+            hslToHex(h, s, l) {
+                const c = (1 - Math.abs(2 * l - 1)) * s;
+                const x = c * (1 - Math.abs((h * 6) % 2 - 1));
+                const m = l - c / 2;
+                let r = 0, g = 0, b = 0;
+
+                if (h < 1/6) { r = c; g = x; }
+                else if (h < 2/6) { r = x; g = c; }
+                else if (h < 3/6) { g = c; b = x; }
+                else if (h < 4/6) { g = x; b = c; }
+                else if (h < 5/6) { r = x; b = c; }
+                else { r = c; b = x; }
+
+                const toHex = (val) => Math.round((val + m) * 255).toString(16).padStart(2, '0');
+                return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+            }
+        }
+
+        // ========== GLOBAL STATE =========
+        let currentGeneration = 0;
+        let currentSeed = null;
+
+        // ========== GENERATE SEED =========
+        function generateSeed() {
+            const textarea = document.getElementById('seedEditor');
+            const text = textarea.value;
+
+            // Parse simple seed syntax
+            const seedObj = {
+                width: 400,
+                height: 400,
+                shapeCount: 8,
+                symmetry: 'radial',
+                symmetryOrder: 4,
+                hue: 0.5,
+                saturation: 0.8,
+            };
+
+            // Extract values from textarea
+            const widthMatch = text.match(/width\s*:\s*(\d+)/);
+            const heightMatch = text.match(/height\s*:\s*(\d+)/);
+            const shapeMatch = text.match(/shapeCount\s*:\s*(\d+)/);
+            const symmetryMatch = text.match(/symmetry\s*:\s*['"]([\w-]+)['"]/);
+            const hueMatch = text.match(/hue\s*:\s*([\d.]+)/);
+            const satMatch = text.match(/saturation\s*:\s*([\d.]+)/);
+
+            if (widthMatch) seedObj.width = parseInt(widthMatch[1]);
+            if (heightMatch) seedObj.height = parseInt(heightMatch[1]);
+            if (shapeMatch) seedObj.shapeCount = parseInt(shapeMatch[1]);
+            if (symmetryMatch) seedObj.symmetry = symmetryMatch[1];
+            if (hueMatch) seedObj.hue = parseFloat(hueMatch[1]);
+            if (satMatch) seedObj.saturation = parseFloat(satMatch[1]);
+
+            // Generate hash
+            const hashStr = JSON.stringify(seedObj);
+            const hash = simpleHash(hashStr);
+            currentSeed = seedObj;
+
+            // Generate SVG
+            const rng = new SimpleRNG(parseInt(hash, 16));
+            const generator = new SimpleSVGGenerator(seedObj, rng);
+            const svg = generator.generate();
+
+            // Update UI
+            document.getElementById('generatedSVG').outerHTML = svg;
+            document.getElementById('seedHash').textContent = hash;
+            document.getElementById('generation').textContent = currentGeneration;
+            document.getElementById('shapeCount').textContent = seedObj.shapeCount;
+            document.getElementById('symmetryType').textContent = seedObj.symmetry;
+        }
+
+        function mutateSeed() {
+            if (!currentSeed) generateSeed();
+
+            const rng = new SimpleRNG(Math.random() * 1000000);
+            currentSeed.shapeCount = Math.max(2, Math.min(50, currentSeed.shapeCount + rng.nextInt(-2, 2)));
+            currentSeed.hue = (currentSeed.hue + rng.next() * 0.2 - 0.1 + 1) % 1;
+            currentSeed.saturation = Math.max(0, Math.min(1, currentSeed.saturation + rng.next() * 0.2 - 0.1));
+            currentGeneration++;
+
+            generateSeed();
+        }
+
+        function breedSeeds() {
+            if (!currentSeed) generateSeed();
+
+            const rng = new SimpleRNG(Math.random() * 1000000);
+            currentSeed.shapeCount = Math.floor((currentSeed.shapeCount + rng.nextInt(3, 15)) / 2);
+            currentSeed.hue = (currentSeed.hue + rng.next() * 0.5) % 1;
+            currentSeed.saturation = (currentSeed.saturation + rng.next() * 0.3) / 2;
+            currentGeneration++;
+
+            generateSeed();
+        }
+
+        // ========== DOMAIN GENERATORS =========
+        function generateDomain(domain) {
+            alert(`${domain.toUpperCase()} generation example!\n\nIn production, this would:\n\n• Parse domain-specific genes\n• Apply developmental pipeline stages\n• Generate domain artifacts (SVG, JSON, etc.)\n• Return complete generated output`);
+        }
+
+        // ========== ANIMATE STATS =========
+        function animateCounter(elementId, target) {
+            const element = document.getElementById(elementId);
+            const duration = 2000;
+            const startTime = Date.now();
+
+            const animate = () => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const current = Math.floor(target * progress);
+                element.textContent = current;
+
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                }
+            };
+
+            animate();
+        }
+
+        // ========== EVOLUTION VISUALIZER =========
+        class EvolutionSimulator {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.generation = 0;
+                this.population = [];
+                this.initPopulation();
+                this.animate();
+            }
+
+            initPopulation() {
+                const count = 20;
+                for (let i = 0; i < count; i++) {
+                    this.population.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        fitness: Math.random(),
+                        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                        vx: (Math.random() - 0.5) * 2,
+                        vy: (Math.random() - 0.5) * 2,
+                    });
+                }
+            }
+
+            animate() {
+                this.ctx.fillStyle = 'rgba(10, 14, 39, 0.3)';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Update population
+                for (const seed of this.population) {
+                    seed.fitness = Math.min(1, seed.fitness + Math.random() * 0.01);
+                    seed.x += seed.vx;
+                    seed.y += seed.vy;
+
+                    // Bounce off walls
+                    if (seed.x < 0 || seed.x > this.canvas.width) seed.vx *= -1;
+                    if (seed.y < 0 || seed.y > this.canvas.height) seed.vy *= -1;
+
+                    seed.x = Math.max(0, Math.min(this.canvas.width, seed.x));
+                    seed.y = Math.max(0, Math.min(this.canvas.height, seed.y));
+
+                    // Draw seed as circle
+                    const radius = 5 + seed.fitness * 5;
+                    this.ctx.fillStyle = seed.color;
+                    this.ctx.globalAlpha = 0.3 + seed.fitness * 0.7;
+                    this.ctx.beginPath();
+                    this.ctx.arc(seed.x, seed.y, radius, 0, Math.PI * 2);
+                    this.ctx.fill();
+                }
+
+                // Selection and mutation every 60 frames
+                if (this.generation % 60 === 0) {
+                    this.population.sort((a, b) => b.fitness - a.fitness);
+                    this.population = this.population.slice(0, 15);
+
+                    // Breed
+                    while (this.population.length < 20) {
+                        const parent = this.population[Math.floor(Math.random() * 5)];
+                        this.population.push({
+                            x: parent.x + (Math.random() - 0.5) * 50,
+                            y: parent.y + (Math.random() - 0.5) * 50,
+                            fitness: parent.fitness * 0.9 + Math.random() * 0.1,
+                            color: parent.color,
+                            vx: (Math.random() - 0.5) * 2,
+                            vy: (Math.random() - 0.5) * 2,
+                        });
+                    }
+                }
+
+                this.generation++;
+
+                // Update stats
+                const avgFitness = this.population.reduce((a, b) => a + b.fitness, 0) / this.population.length;
+                const maxFitness = Math.max(...this.population.map(s => s.fitness));
+                document.getElementById('evoGen').textContent = Math.floor(this.generation / 60);
+                document.getElementById('evoFit').textContent = avgFitness.toFixed(2);
+                document.getElementById('evoMax').textContent = maxFitness.toFixed(2);
+
+                this.ctx.globalAlpha = 1;
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // ========== INITIALIZE =========
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animate counters
+            animateCounter('stat-files', 33);
+            animateCounter('stat-lines', 13376);
+            animateCounter('stat-tests', 330);
+
+            // Generate initial seed
+            generateSeed();
+
+            // Start evolution simulator
+            new EvolutionSimulator('evolutionCanvas');
+        });
+
+        // Draw simple 3D cube for 3D preview
+        window.addEventListener('load', () => {
+            const canvas = document.getElementById('canvas3d');
+            if (canvas && canvas.getContext) {
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#0a0e27';
+                ctx.fillRect(0, 0, 200, 200);
+
+                // Draw wireframe cube
+                ctx.strokeStyle = '#00ff88';
+                ctx.lineWidth = 2;
+
+                const vertices = [
+                    [30, 30], [170, 30], [170, 170], [30, 170], // front
+                    [50, 20], [190, 20], [190, 160], [50, 160], // back
+                ];
+
+                // Draw cube edges
+                ctx.beginPath();
+                ctx.moveTo(vertices[0][0], vertices[0][1]);
+                ctx.lineTo(vertices[1][0], vertices[1][1]);
+                ctx.lineTo(vertices[2][0], vertices[2][1]);
+                ctx.lineTo(vertices[3][0], vertices[3][1]);
+                ctx.closePath();
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(vertices[4][0], vertices[4][1]);
+                ctx.lineTo(vertices[5][0], vertices[5][1]);
+                ctx.lineTo(vertices[6][0], vertices[6][1]);
+                ctx.lineTo(vertices[7][0], vertices[7][1]);
+                ctx.closePath();
+                ctx.stroke();
+
+                // Connect front to back
+                for (let i = 0; i < 4; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(vertices[i][0], vertices[i][1]);
+                    ctx.lineTo(vertices[i + 4][0], vertices[i + 4][1]);
+                    ctx.stroke();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

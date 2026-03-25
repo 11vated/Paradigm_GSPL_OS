@@ -1,0 +1,24 @@
+seed LofiTrack : audio {
+  genes {
+    type: "full-track"
+    tempo: 85
+    key: "D"
+    scale: "minor"
+    octaveRange: 2
+    baseOctave: 3
+    density: 0.4
+    complexity: 5
+    swing: 0.3
+    dynamics: 0.6
+    bars: 16
+    timeSignatureTop: 4
+    timeSignatureBottom: "4"
+    synthType: "triangle"
+    attack: 0.05
+    decay: 0.3
+    sustain: 0.6
+    release: 0.8
+    reverbMix: 0.5
+    delayMix: 0.3
+  }
+}

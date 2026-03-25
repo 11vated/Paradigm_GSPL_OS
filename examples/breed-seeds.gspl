@@ -1,0 +1,25 @@
+seed FireFlower : visual2d {
+  genes {
+    width: 600
+    height: 600
+    complexity: 8
+    symmetry: "radial"
+    style: "organic"
+    density: 0.7
+    curvature: 0.9
+  }
+}
+
+seed IceCrystal : visual2d {
+  genes {
+    width: 600
+    height: 600
+    complexity: 6
+    symmetry: "bilateral"
+    style: "geometric"
+    density: 0.4
+    curvature: 0.1
+  }
+}
+
+let hybrid = breed(FireFlower, IceCrystal, 0.6)

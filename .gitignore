@@ -1,0 +1,12 @@
+node_modules/
+dist/
+coverage/
+*.js.map
+.env
+.DS_Store
+vitest.config.ts.timestamp-*
+studio/dist/
+studio/node_modules/
+output/
+.paradigm/
+*.gseed

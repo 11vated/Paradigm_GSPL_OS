@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paradigm Studio — Generative Seed Platform</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'SF Mono', 'Fira Code', 'JetBrains Mono', monospace;
+      background: #0a0a0f;
+      color: #e0e0e0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .header {
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(10,10,15,0.95);
+      backdrop-filter: blur(20px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    button {
+      padding: 8px 16px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.05);
+      color: #e0e0e0;
+      font-family: inherit;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    button:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-color: #6366f1;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    button.primary:hover {
+      background: linear-gradient(135deg, #7c7ff5, #9d6ffa);
+    }
+
+    button.danger {
+      border-color: #ef4444;
+      color: #ef4444;
+    }
+
+    select {
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.05);
+      color: #e0e0e0;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      padding: 24px 32px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .panel-header h3 {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #888;
+    }
+
+    .domain-badge {
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .domain-badge.visual { background: rgba(99,102,241,0.15); color: #818cf8; }
+    .domain-badge.audio { background: rgba(236,72,153,0.15); color: #f472b6; }
+    .domain-badge.game { background: rgba(34,197,94,0.15); color: #4ade80; }
+    .domain-badge.anim { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .domain-badge.mesh { background: rgba(14,165,233,0.15); color: #38bdf8; }
+
+    .panel-body {
+      padding: 16px;
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .panel-body canvas, .panel-body svg {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+
+    .info-bar {
+      padding: 8px 16px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 11px;
+      color: #666;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .seed-info {
+      padding: 16px 32px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 12px;
+      color: #888;
+      flex-wrap: wrap;
+    }
+
+    .seed-info .label { color: #555; }
+    .seed-info .value { color: #ccc; font-weight: 600; }
+
+    .gene-slider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+    }
+
+    .gene-slider label { color: #777; min-width: 80px; }
+    .gene-slider input[type="range"] {
+      width: 120px;
+      accent-color: #6366f1;
+    }
+    .gene-slider .val { color: #aaa; min-width: 36px; text-align: right; }
+
+    .status {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+    .status.ok { background: #4ade80; }
+    .status.playing { background: #f472b6; animation: pulse 1s infinite; }
+    .status.idle { background: #555; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #444;
+      font-size: 13px;
+    }
+
+    .empty-state .icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+      opacity: 0.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">PARADIGM</div>
+    <div class="controls">
+      <select id="domainSelect">
+        <option value="all">All Domains</option>
+        <option value="visual2d">Visual 2D</option>
+        <option value="audio">Audio</option>
+        <option value="fullgame">Full Game</option>
+        <option value="animation">Animation</option>
+        <option value="geometry3d">Geometry 3D</option>
+      </select>
+      <button class="primary" id="generateBtn">Generate</button>
+      <button id="mutateBtn">Mutate</button>
+      <button id="evolveBtn">Evolve x10</button>
+    </div>
+  </div>
+
+  <div class="seed-info" id="seedInfo">
+    <div><span class="label">Seed: </span><span class="value" id="seedName">—</span></div>
+    <div><span class="label">Hash: </span><span class="value" id="seedHash">—</span></div>
+    <div><span class="label">Generation: </span><span class="value" id="seedGen">0</span></div>
+    <div><span class="label">Domain: </span><span class="value" id="seedDomain">—</span></div>
+  </div>
+
+  <div class="grid" id="grid">
+    <!-- Visual Panel -->
+    <div class="panel" id="visualPanel">
+      <div class="panel-header">
+        <h3>Visual</h3>
+        <span class="domain-badge visual">visual2d</span>
+      </div>
+      <div class="panel-body" id="visualContainer">
+        <div class="empty-state"><div class="icon">&#9670;</div>Click Generate to create a seed</div>
+      </div>
+      <div class="info-bar">
+        <span><span class="status idle" id="visualStatus"></span>Ready</span>
+        <span id="visualTiming">—</span>
+      </div>
+    </div>
+
+    <!-- Audio Panel -->
+    <div class="panel" id="audioPanel">
+      <div class="panel-header">
+        <h3>Audio</h3>
+        <div>
+          <button id="playBtn" style="padding:4px 12px;font-size:12px;">Play</button>
+          <button id="stopBtn" style="padding:4px 12px;font-size:12px;">Stop</button>
+          <span class="domain-badge audio" style="margin-left:8px;">audio</span>
+        </div>
+      </div>
+      <div class="panel-body" id="audioContainer">
+        <div class="empty-state"><div class="icon">&#9835;</div>Audio will synthesize from seed</div>
+      </div>
+      <div class="info-bar">
+        <span><span class="status idle" id="audioStatus"></span>Ready</span>
+        <span id="audioTiming">—</span>
+      </div>
+    </div>
+
+    <!-- Game Panel -->
+    <div class="panel" id="gamePanel">
+      <div class="panel-header">
+        <h3>Game</h3>
+        <div>
+          <button id="startGameBtn" style="padding:4px 12px;font-size:12px;">Start</button>
+          <button id="restartGameBtn" style="padding:4px 12px;font-size:12px;">Restart</button>
+          <span class="domain-badge game" style="margin-left:8px;">fullgame</span>
+        </div>
+      </div>
+      <div class="panel-body" id="gameContainer">
+        <div class="empty-state"><div class="icon">&#9654;</div>Playable game from seed</div>
+      </div>
+      <div class="info-bar">
+        <span><span class="status idle" id="gameStatus"></span>Ready</span>
+        <span id="gameScore">Score: 0</span>
+      </div>
+    </div>
+
+    <!-- 3D Panel -->
+    <div class="panel" id="meshPanel">
+      <div class="panel-header">
+        <h3>3D Mesh</h3>
+        <div>
+          <button id="exportObjBtn" style="padding:4px 12px;font-size:12px;">Export OBJ</button>
+          <span class="domain-badge mesh" style="margin-left:8px;">geometry3d</span>
+        </div>
+      </div>
+      <div class="panel-body" id="meshContainer">
+        <div class="empty-state"><div class="icon">&#9674;</div>3D geometry from seed</div>
+      </div>
+      <div class="info-bar">
+        <span><span class="status idle" id="meshStatus"></span>Ready</span>
+        <span id="meshInfo">—</span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // ========================================================================
+    // PARADIGM STUDIO — Runtime Script
+    // This demo runs the engine in-browser. In production, the engine modules
+    // would be bundled via Vite/esbuild. For now we use dynamic imports.
+    // ========================================================================
+
+    // Since this is a demo HTML file, we provide a message about bundling.
+    // The renderers and engine are TypeScript modules that need bundling.
+    // This file serves as the UI shell and integration template.
+
+    const generateBtn = document.getElementById('generateBtn');
+    const mutateBtn = document.getElementById('mutateBtn');
+    const evolveBtn = document.getElementById('evolveBtn');
+    const playBtn = document.getElementById('playBtn');
+    const stopBtn = document.getElementById('stopBtn');
+    const startGameBtn = document.getElementById('startGameBtn');
+    const restartGameBtn = document.getElementById('restartGameBtn');
+    const exportObjBtn = document.getElementById('exportObjBtn');
+
+    // State
+    let currentSeedName = 'Unnamed';
+    let generation = 0;
+
+    function updateSeedInfo(name, hash, gen, domain) {
+      document.getElementById('seedName').textContent = name;
+      document.getElementById('seedHash').textContent = hash?.substring(0, 12) + '...' || '—';
+      document.getElementById('seedGen').textContent = gen;
+      document.getElementById('seedDomain').textContent = domain;
+    }
+
+    function setStatus(id, state, text) {
+      const el = document.getElementById(id);
+      el.className = 'status ' + state;
+      el.parentElement.childNodes[1].textContent = text || state;
+    }
+
+    // Generate button — shows how the flow works
+    generateBtn?.addEventListener('click', () => {
+      generation = 0;
+      currentSeedName = 'Seed_' + Math.random().toString(36).substring(2, 8);
+      const hash = Math.random().toString(16).substring(2, 18);
+      const domain = document.getElementById('domainSelect').value;
+      updateSeedInfo(currentSeedName, hash, generation, domain);
+
+      // Visual
+      setStatus('visualStatus', 'ok', 'Generated');
+      document.getElementById('visualContainer').innerHTML =
+        '<div style="color:#666;font-size:12px;text-align:center;padding:20px;">'+
+        'Engine output renders here when bundled.<br><br>'+
+        '<strong style="color:#818cf8;">Visual2D Engine</strong> generates SVG artwork<br>'+
+        'with shapes, colors, symmetry, and style.<br><br>'+
+        '<code style="color:#555;">VisualRenderer.renderSeed(seed)</code></div>';
+      document.getElementById('visualTiming').textContent = '~15ms';
+
+      // Audio
+      setStatus('audioStatus', 'ok', 'Loaded');
+      document.getElementById('audioContainer').innerHTML =
+        '<div style="color:#666;font-size:12px;text-align:center;padding:20px;">'+
+        '<strong style="color:#f472b6;">Audio Engine</strong> generates music data<br>'+
+        'with melody, harmony, bass, and effects.<br><br>'+
+        'Click <strong>Play</strong> to synthesize via Web Audio API.<br><br>'+
+        '<code style="color:#555;">AudioRenderer.play()</code></div>';
+      document.getElementById('audioTiming').textContent = '~8ms';
+
+      // Game
+      setStatus('gameStatus', 'ok', 'Ready');
+      document.getElementById('gameContainer').innerHTML =
+        '<div style="color:#666;font-size:12px;text-align:center;padding:20px;">'+
+        '<strong style="color:#4ade80;">FullGame Engine</strong> generates playable games<br>'+
+        'with tiles, entities, items, rules, and HUD.<br><br>'+
+        'Click <strong>Start</strong> to play. Arrow keys to move, Space to jump.<br><br>'+
+        '<code style="color:#555;">GameRenderer.start()</code></div>';
+      document.getElementById('gameScore').textContent = 'Score: 0';
+
+      // 3D
+      setStatus('meshStatus', 'ok', 'Rendered');
+      document.getElementById('meshContainer').innerHTML =
+        '<div style="color:#666;font-size:12px;text-align:center;padding:20px;">'+
+        '<strong style="color:#38bdf8;">Geometry3D Engine</strong> generates 3D meshes<br>'+
+        'via marching cubes with SDF primitives.<br><br>'+
+        'Renders in WebGL with PBR-like shading.<br>'+
+        'Auto-rotates. Export to OBJ for 3D printing.<br><br>'+
+        '<code style="color:#555;">ThreeRenderer.loadSeed(seed)</code></div>';
+      document.getElementById('meshInfo').textContent = '~2k vertices';
+    });
+
+    mutateBtn?.addEventListener('click', () => {
+      generation++;
+      document.getElementById('seedGen').textContent = generation;
+      const hash = Math.random().toString(16).substring(2, 18);
+      document.getElementById('seedHash').textContent = hash.substring(0, 12) + '...';
+    });
+
+    evolveBtn?.addEventListener('click', () => {
+      generation += 10;
+      document.getElementById('seedGen').textContent = generation;
+      const hash = Math.random().toString(16).substring(2, 18);
+      document.getElementById('seedHash').textContent = hash.substring(0, 12) + '...';
+    });
+
+    // Info on how to run with actual engine
+    console.log(`
+    ╔══════════════════════════════════════════════════════════════╗
+    ║  PARADIGM STUDIO — Demo Shell                               ║
+    ║                                                              ║
+    ║  This HTML file is the UI template for the Paradigm Studio.  ║
+    ║  To run with the actual engine:                              ║
+    ║                                                              ║
+    ║  1. Bundle with Vite:                                        ║
+    ║     import { registry } from './src/engines/index.js'        ║
+    ║     import { VisualRenderer } from './src/renderers'         ║
+    ║     import { createSeed } from './src/kernel/seed.js'        ║
+    ║                                                              ║
+    ║  2. Create a seed:                                           ║
+    ║     const seed = createSeed('visual2d', 'MyArt', genes)     ║
+    ║                                                              ║
+    ║  3. Render:                                                  ║
+    ║     const renderer = new VisualRenderer({ container })       ║
+    ║     renderer.renderSeed(seed)                                ║
+    ║                                                              ║
+    ║  All 5 renderers (Visual, Audio, Game, Animation, 3D)       ║
+    ║  are ready in src/renderers/                                 ║
+    ╚══════════════════════════════════════════════════════════════╝
+    `);
+  </script>
+</body>
+</html>

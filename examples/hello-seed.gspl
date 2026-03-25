@@ -1,0 +1,11 @@
+seed HelloWorld : visual2d {
+  genes {
+    width: 400
+    height: 400
+    complexity: 5
+    symmetry: "radial"
+    style: "geometric"
+    density: 0.6
+    curvature: 0.3
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/core/tauri-config-schema/schema.json",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devPath": "http://localhost:5173",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "package": {
+    "productName": "GSPL Paradigm Engine",
+    "version": "1.0.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "shell": {
+        "all": false,
+        "open": true
+      },
+      "fs": {
+        "all": true,
+        "scope": [
+          "$APPDATA/**",
+          "$DOCUMENT/**",
+          "$DESKTOP/**",
+          "$HOME/**"
+        ]
+      },
+      "dialog": {
+        "all": true
+      },
+      "window": {
+        "all": true
+      },
+      "http": {
+        "all": true,
+        "scope": [
+          "http://**",
+          "https://**"
+        ]
+      }
+    },
+    "bundle": {
+      "active": true,
+      "targets": [
+        "msi",
+        "nsis",
+        "appimage",
+        "dmg"
+      ],
+      "identifier": "com.11vatedtech.gspl-engine",
+      "icon": [
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
+      ],
+      "resources": []
+    },
+    "windows": [
+      {
+        "title": "GSPL Paradigm Engine",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 800,
+        "minHeight": 600,
+        "resizable": true,
+        "fullscreen": false,
+        "focus": true,
+        "transparent": false,
+        "decorations": true,
+        "alwaysOnTop": false,
+        "visible": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' https:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
+    }
+  }
+}

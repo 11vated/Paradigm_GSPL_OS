@@ -1,0 +1,43 @@
+seed GameWorld : procedural {
+  genes {
+    type: "terrain"
+    width: 128
+    height: 128
+    octaves: 6
+    persistence: 0.5
+    lacunarity: 2.0
+    threshold: 0.4
+    erosionPasses: 5
+  }
+}
+
+seed WorldTheme : audio {
+  genes {
+    type: "ambient"
+    tempo: 60
+    key: "A"
+    scale: "pentatonic"
+    density: 0.2
+    complexity: 3
+    bars: 32
+    synthType: "sine"
+    attack: 0.5
+    decay: 1.0
+    sustain: 0.8
+    release: 2.0
+    reverbMix: 0.7
+    delayMix: 0.2
+  }
+}
+
+seed WorldArt : visual2d {
+  genes {
+    width: 800
+    height: 600
+    complexity: 6
+    symmetry: "none"
+    style: "organic"
+    density: 0.5
+    curvature: 0.6
+  }
+}

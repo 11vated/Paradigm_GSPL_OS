@@ -1,0 +1,15 @@
+seed WalkCycle : animation {
+  genes {
+    type: "sprite-sheet"
+    duration: 1.0
+    fps: 12
+    easing: "ease-in-out"
+    looping: "loop"
+    complexity: 4
+    amplitude: 1.0
+    frequency: 1.0
+    phaseOffset: 0
+    spriteSize: 64
+    frameCount: 8
+  }
+}
